@@ -11,6 +11,7 @@
 
 #include <list>
 #include <map>
+#include <memory>
 #include <vector>
 
 class Rayman3XInput_DirectInputDevice8A : public IDirectInputDevice8A

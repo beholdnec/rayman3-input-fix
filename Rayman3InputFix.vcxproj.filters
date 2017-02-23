@@ -2,8 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source">
-      <UniqueIdentifier>{02b7d263-9b02-465f-8598-cbc75900c6c1}</UniqueIdentifier>
+      <UniqueIdentifier>{9edc6eed-185f-44fe-bf77-4a7a9e47228f}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dinput8.def">
+      <Filter>Source</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -12,10 +17,10 @@
     <ClCompile Include="Rayman3InputFix_DirectInput8A.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Rayman3XInput_DirectInputDevice8A.cpp">
+    <ClCompile Include="Rayman3Vibration_DirectInputEffect.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Rayman3Vibration_DirectInputEffect.cpp">
+    <ClCompile Include="Rayman3XInput_DirectInputDevice8A.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="WindowsUtils.cpp">
@@ -23,19 +28,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="dinput8.def">
-      <Filter>Source</Filter>
-    </None>
-    <None Include="Readme.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Rayman3InputFix_DirectInput8A.hpp">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Rayman3XInput_DirectInputDevice8A.hpp">
+    <ClInclude Include="Rayman3Vibration_DirectInputEffect.hpp">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Rayman3Vibration_DirectInputEffect.hpp">
+    <ClInclude Include="Rayman3XInput_DirectInputDevice8A.hpp">
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="WindowsUtils.hpp">
