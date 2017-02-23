@@ -1,0 +1,27 @@
+// Main.cpp
+// Nolan Check
+// Created 2/25/2012
+
+#include "Rayman3InputFix_DirectInput8A.hpp"
+
+HRESULT WINAPI DirectInput8Create(HINSTANCE hinst, DWORD dwVersion,
+	REFIID riidltf, LPVOID* ppvOut, LPUNKNOWN punkOuter)
+{
+	HRESULT hr;
+
+	if (riidltf == IID_IDirectInput8A)
+	{
+		hr = Rayman3InputFix_DirectInput8A::Create(riidltf, ppvOut, hinst);
+		if (SUCCEEDED(hr))
+		{
+			IDirectInput8A* p = (IDirectInput8A*)*ppvOut;
+			hr = p->Initialize(hinst, dwVersion);
+		}
+	}
+	else
+	{
+		hr = DIERR_INVALIDPARAM;
+	}
+
+	return hr;
+}
