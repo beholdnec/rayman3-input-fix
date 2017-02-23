@@ -21,7 +21,16 @@ void Debug(const char* msg, ...)
 	vsprintf_s(buf, len, msg, args);
 
 	va_end(args);
-
+  
+#if 1
+  FILE* flog = NULL;
+  fopen_s(&flog, "r3if-log.txt", "a");
+  if (flog)
+  {
+    fprintf(flog, "%s", buf);
+    fclose(flog);
+  }
+#endif
 	OutputDebugStringA(buf);
 	delete[] buf;
 }

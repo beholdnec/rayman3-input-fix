@@ -454,6 +454,19 @@ HRESULT Rayman3XInput_DirectInputDevice8A::GetImageInfo(THIS_ LPDIDEVICEIMAGEINF
 	return E_NOTIMPL;
 }
 
+static float LerpRangeToRange(float x, float x0, float x1, float y0, float y1)
+{
+  return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
+}
+
+// Due to a limitation in Rayman 3's programming, reported axis values must be in the range -1000..1000.
+static const LONG AXIS_MIN = -1000;
+static const LONG AXIS_MAX = 1000;
+static const float AXIS_MINf = static_cast<float>(AXIS_MIN);
+static const float AXIS_MAXf = static_cast<float>(AXIS_MAX);
+static const float SHRT_MINf = static_cast<float>(SHRT_MIN);
+static const float SHRT_MAXf = static_cast<float>(SHRT_MAX);
+
 void Rayman3XInput_DirectInputDevice8A::ResetControls()
 {
 	m_availableControls.clear();
@@ -469,11 +482,12 @@ void Rayman3XInput_DirectInputDevice8A::ResetControls()
 			return dwType == DIDFT_AXIS;
 		}
 		virtual void GetRange(LPDIPROPRANGE prop) {
-			prop->lMin = -32768;
-			prop->lMax = 32767;
+			prop->lMin = AXIS_MIN;
+			prop->lMax = AXIS_MAX;
 		}
-		virtual void GetState(LPVOID dst, const XINPUT_STATE& state) {
-			*(LONG*)dst = state.Gamepad.sThumbLX;
+		virtual void GetState(LPVOID dst_, const XINPUT_STATE& state) {
+      LONG* dst = static_cast<LONG*>(dst_);
+			*dst = static_cast<LONG>(LerpRangeToRange(state.Gamepad.sThumbLX, SHRT_MINf, SHRT_MAXf, AXIS_MINf, AXIS_MAXf));
 		}
 	};
 
@@ -487,12 +501,13 @@ void Rayman3XInput_DirectInputDevice8A::ResetControls()
 			return dwType == DIDFT_AXIS;
 		}
 		virtual void GetRange(LPDIPROPRANGE prop) {
-			prop->lMin = -32767;
-			prop->lMax = 32768;
+			prop->lMin = AXIS_MIN;
+			prop->lMax = AXIS_MAX;
 		}
-		virtual void GetState(LPVOID dst, const XINPUT_STATE& state) {
-			// Axis is inverted from what DirectInput expects
-			*(LONG*)dst = -state.Gamepad.sThumbLY;
+		virtual void GetState(LPVOID dst_, const XINPUT_STATE& state) {
+			// Y axis is inverted when reporting to DirectInput, hence MAX and MIN are switched.
+      LONG* dst = static_cast<LONG*>(dst_);
+      *dst = static_cast<LONG>(LerpRangeToRange(state.Gamepad.sThumbLY, SHRT_MAXf, SHRT_MINf, AXIS_MINf, AXIS_MAXf));
 		}
 	};
 
@@ -506,11 +521,12 @@ void Rayman3XInput_DirectInputDevice8A::ResetControls()
 			return dwType == DIDFT_AXIS;
 		}
 		virtual void GetRange(LPDIPROPRANGE prop) {
-			prop->lMin = -32768;
-			prop->lMax = 32767;
+			prop->lMin = AXIS_MIN;
+			prop->lMax = AXIS_MAX;
 		}
-		virtual void GetState(LPVOID dst, const XINPUT_STATE& state) {
-			*(LONG*)dst = state.Gamepad.sThumbRX;
+		virtual void GetState(LPVOID dst_, const XINPUT_STATE& state) {
+      LONG* dst = static_cast<LONG*>(dst_);
+      *dst = static_cast<LONG>(LerpRangeToRange(state.Gamepad.sThumbRX, SHRT_MINf, SHRT_MAXf, AXIS_MINf, AXIS_MAXf));
 		}
 	};
 
@@ -524,12 +540,13 @@ void Rayman3XInput_DirectInputDevice8A::ResetControls()
 			return dwType == DIDFT_AXIS;
 		}
 		virtual void GetRange(LPDIPROPRANGE prop) {
-			prop->lMin = -32767;
-			prop->lMax = 32768;
+			prop->lMin = AXIS_MIN;
+			prop->lMax = AXIS_MAX;
 		}
-		virtual void GetState(LPVOID dst, const XINPUT_STATE& state) {
-			// Axis is inverted from what DirectInput expects
-			*(LONG*)dst = -state.Gamepad.sThumbRY;
+		virtual void GetState(LPVOID dst_, const XINPUT_STATE& state) {
+			// Y axis is inverted when reporting to DirectInput, hence MAX and MIN are switched.
+      LONG* dst = static_cast<LONG*>(dst_);
+      *dst = static_cast<LONG>(LerpRangeToRange(state.Gamepad.sThumbRY, SHRT_MAXf, SHRT_MINf, AXIS_MINf, AXIS_MAXf));
 		}
 	};
 
@@ -550,8 +567,9 @@ void Rayman3XInput_DirectInputDevice8A::ResetControls()
 			prop->lMin = 0;
 			prop->lMax = 0x80;
 		}
-		virtual void GetState(LPVOID dst, const XINPUT_STATE& state) {
-			*(BYTE*)dst = (state.Gamepad.wButtons & m_buttonMask) ? 0x80 : 0;
+		virtual void GetState(LPVOID dst_, const XINPUT_STATE& state) {
+      BYTE* dst = static_cast<BYTE*>(dst_);
+			*dst = (state.Gamepad.wButtons & m_buttonMask) ? 0x80 : 0;
 		}
 	private:
 		WORD m_buttonMask;
@@ -570,8 +588,10 @@ void Rayman3XInput_DirectInputDevice8A::ResetControls()
 			prop->lMin = 0;
 			prop->lMax = 0x80;
 		}
-		virtual void GetState(LPVOID dst, const XINPUT_STATE& state) {
-			*(BYTE*)dst = (state.Gamepad.bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD) ? 0x80 : 0;
+		virtual void GetState(LPVOID dst_, const XINPUT_STATE& state) {
+      // Analog triggers are converted to buttons.
+      BYTE* dst = static_cast<BYTE*>(dst_);
+			*dst = (state.Gamepad.bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD) ? 0x80 : 0;
 		}
 	};
 
@@ -588,8 +608,10 @@ void Rayman3XInput_DirectInputDevice8A::ResetControls()
 			prop->lMin = 0;
 			prop->lMax = 0x80;
 		}
-		virtual void GetState(LPVOID dst, const XINPUT_STATE& state) {
-			*(BYTE*)dst = (state.Gamepad.bRightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD) ? 0x80 : 0;
+		virtual void GetState(LPVOID dst_, const XINPUT_STATE& state) {
+      // Analog triggers are converted to buttons.
+      BYTE* dst = static_cast<BYTE*>(dst_);
+			*dst = (state.Gamepad.bRightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD) ? 0x80 : 0;
 		}
 	};
 
